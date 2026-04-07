@@ -60,22 +60,21 @@ export default function EquityCurve() {
     value: s.total_value_usdt,
   }));
 
-  const latestValue = chartData.length > 0 ? chartData[chartData.length - 1].value : 100;
-  const isProfit = latestValue >= 100;
-
   return (
-    <div className="bg-card rounded-xl p-4 border border-white/5">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-white font-semibold">Equity Curve</h2>
+    <div className="bg-surface rounded-sm border border-border p-8 sm:p-10 card-hover animate-fade-in-delay-2">
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="font-serif font-normal italic text-lg text-primary">
+          Portfolio Value
+        </h2>
         <div className="flex gap-1">
           {(["7D", "30D", "ALL"] as Range[]).map((r) => (
             <button
               key={r}
               onClick={() => setRange(r)}
-              className={`px-3 py-1 text-xs rounded-lg transition-colors ${
+              className={`px-4 py-1.5 text-[10px] tracking-luxury uppercase font-sans font-light rounded-full transition-all duration-300 ${
                 range === r
-                  ? "bg-white/10 text-white"
-                  : "text-muted hover:text-white"
+                  ? "bg-gold text-white"
+                  : "text-subtle hover:text-primary"
               }`}
             >
               {r}
@@ -84,60 +83,68 @@ export default function EquityCurve() {
         </div>
       </div>
       {chartData.length === 0 ? (
-        <div className="h-64 flex items-center justify-center text-muted text-sm">
-          Bot just started — check back soon!
+        <div className="h-72 flex flex-col items-center justify-center">
+          <p className="font-serif font-light italic text-secondary text-lg">
+            The bot begins its journey.
+          </p>
+          <p className="font-sans font-light text-xs text-subtle mt-2">
+            Performance data will appear with each trade cycle.
+          </p>
+          <div className="w-12 h-px bg-gold mt-6" />
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={280}>
+        <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={chartData}>
             <defs>
-              <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="0%"
-                  stopColor={isProfit ? "#00ff88" : "#ff4444"}
-                  stopOpacity={0.3}
-                />
-                <stop
-                  offset="100%"
-                  stopColor={isProfit ? "#00ff88" : "#ff4444"}
-                  stopOpacity={0}
-                />
+              <linearGradient id="goldGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#B8975A" stopOpacity={0.08} />
+                <stop offset="100%" stopColor="#B8975A" stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis
               dataKey="time"
-              stroke="#333"
-              tick={{ fill: "#888", fontSize: 11 }}
+              stroke="#F0EDE8"
+              tick={{ fill: "#A09890", fontSize: 11, fontFamily: "Inter" }}
               tickLine={false}
+              axisLine={false}
             />
             <YAxis
-              stroke="#333"
-              tick={{ fill: "#888", fontSize: 11 }}
+              stroke="#F0EDE8"
+              tick={{ fill: "#A09890", fontSize: 11, fontFamily: "Inter" }}
               tickLine={false}
+              axisLine={false}
               domain={["auto", "auto"]}
               tickFormatter={(v) => `$${v}`}
             />
             <Tooltip
               contentStyle={{
-                background: "#1a1a1a",
-                border: "1px solid #333",
-                borderRadius: "8px",
+                background: "#FFFFFF",
+                border: "1px solid #E8E4DE",
+                borderRadius: "2px",
                 fontSize: "12px",
+                fontFamily: "Inter",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
               }}
               formatter={(value: number) => [`$${value.toFixed(2)}`, "Value"]}
             />
             <ReferenceLine
               y={100}
-              stroke="#444"
-              strokeDasharray="3 3"
-              label={{ value: "$100", fill: "#666", fontSize: 11 }}
+              stroke="#E8E4DE"
+              strokeDasharray="4 4"
+              label={{
+                value: "$100",
+                fill: "#A09890",
+                fontSize: 11,
+                fontFamily: "Inter",
+              }}
             />
             <Area
               type="monotone"
               dataKey="value"
-              stroke={isProfit ? "#00ff88" : "#ff4444"}
+              stroke="#B8975A"
               strokeWidth={2}
-              fill="url(#gradient)"
+              fill="url(#goldGradient)"
+              dot={false}
             />
           </AreaChart>
         </ResponsiveContainer>

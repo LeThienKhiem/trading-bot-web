@@ -30,34 +30,52 @@ export default function TradeHistory() {
   }
 
   const actionColors: Record<string, string> = {
-    BUY: "text-accent",
-    SELL: "text-yellow-400",
-    HOLD: "text-muted",
+    BUY: "text-positive",
+    SELL: "text-gold",
+    HOLD: "text-neutral",
     BLOCKED: "text-negative",
   };
 
   if (trades.length === 0) {
     return (
-      <div className="bg-card rounded-xl p-4 border border-white/5">
-        <h2 className="text-white font-semibold mb-3">Trade History</h2>
-        <p className="text-muted text-sm">No trades yet. Bot is warming up...</p>
+      <div className="bg-surface rounded-sm border border-border p-8 card-hover">
+        <h2 className="font-serif font-normal italic text-lg text-primary mb-6">
+          Trade History
+        </h2>
+        <p className="font-sans font-light text-sm text-subtle">
+          No trades recorded yet.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-card rounded-xl p-4 border border-white/5">
-      <h2 className="text-white font-semibold mb-3">Trade History</h2>
+    <div className="bg-surface rounded-sm border border-border p-8 sm:p-10 card-hover animate-fade-in-delay-4">
+      <h2 className="font-serif font-normal italic text-lg text-primary mb-8">
+        Trade History
+      </h2>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full">
           <thead>
-            <tr className="text-muted text-xs uppercase tracking-wider border-b border-white/5">
-              <th className="text-left py-2 pr-2">Time</th>
-              <th className="text-left py-2 pr-2">Action</th>
-              <th className="text-right py-2 pr-2">BTC Price</th>
-              <th className="text-right py-2 pr-2">Conf</th>
-              <th className="text-right py-2 pr-2">P&L</th>
-              <th className="text-right py-2">%</th>
+            <tr className="border-b border-border">
+              <th className="text-left py-3 pr-4 font-sans font-light text-[10px] tracking-luxury uppercase text-subtle">
+                Time
+              </th>
+              <th className="text-left py-3 pr-4 font-sans font-light text-[10px] tracking-luxury uppercase text-subtle">
+                Action
+              </th>
+              <th className="text-right py-3 pr-4 font-sans font-light text-[10px] tracking-luxury uppercase text-subtle">
+                Price
+              </th>
+              <th className="text-right py-3 pr-4 font-sans font-light text-[10px] tracking-luxury uppercase text-subtle hidden sm:table-cell">
+                Confidence
+              </th>
+              <th className="text-right py-3 pr-4 font-sans font-light text-[10px] tracking-luxury uppercase text-subtle">
+                P&L
+              </th>
+              <th className="text-right py-3 font-sans font-light text-[10px] tracking-luxury uppercase text-subtle">
+                Return
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -65,17 +83,23 @@ export default function TradeHistory() {
               const pnl = trade.pnl_usdt;
               const pnlPct = trade.pnl_percent;
               const isExpanded = expanded === trade.id;
+              const pnlColor =
+                pnl === null
+                  ? "text-subtle"
+                  : pnl > 0
+                  ? "text-positive"
+                  : pnl < 0
+                  ? "text-negative"
+                  : "text-subtle";
 
               return (
                 <>
                   <tr
                     key={trade.id}
-                    onClick={() =>
-                      setExpanded(isExpanded ? null : trade.id)
-                    }
-                    className="border-b border-white/5 cursor-pointer hover:bg-white/5 transition-colors"
+                    onClick={() => setExpanded(isExpanded ? null : trade.id)}
+                    className="cursor-pointer hover:bg-surface-alt transition-colors duration-200"
                   >
-                    <td className="py-2 pr-2 text-muted text-xs whitespace-nowrap">
+                    <td className="py-3.5 pr-4 font-sans font-light text-xs text-secondary tabular-nums whitespace-nowrap">
                       {new Date(trade.created_at).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
@@ -85,60 +109,41 @@ export default function TradeHistory() {
                         minute: "2-digit",
                       })}
                     </td>
-                    <td className="py-2 pr-2">
+                    <td className="py-3.5 pr-4">
                       <span
-                        className={`font-medium ${
-                          actionColors[trade.action] || "text-muted"
+                        className={`font-sans font-normal text-xs tracking-wider uppercase ${
+                          actionColors[trade.action] || "text-subtle"
                         }`}
                       >
                         {trade.action}
                       </span>
                     </td>
-                    <td className="py-2 pr-2 text-right font-mono text-white">
+                    <td className="py-3.5 pr-4 text-right font-sans font-normal text-sm text-primary tabular-nums">
                       ${trade.price_at_decision?.toLocaleString()}
                     </td>
-                    <td className="py-2 pr-2 text-right text-muted">
+                    <td className="py-3.5 pr-4 text-right font-sans font-light text-xs text-subtle hidden sm:table-cell">
                       {trade.confidence}/10
                     </td>
-                    <td
-                      className={`py-2 pr-2 text-right font-mono ${
-                        pnl === null
-                          ? "text-muted"
-                          : pnl > 0
-                          ? "text-accent"
-                          : pnl < 0
-                          ? "text-negative"
-                          : "text-muted"
-                      }`}
-                    >
-                      {pnl !== null ? `${pnl > 0 ? "+" : ""}$${pnl.toFixed(2)}` : "—"}
+                    <td className={`py-3.5 pr-4 text-right font-serif font-light text-sm tabular-nums ${pnlColor}`}>
+                      {pnl !== null
+                        ? `${pnl > 0 ? "+" : ""}$${pnl.toFixed(2)}`
+                        : "\u2014"}
                     </td>
-                    <td
-                      className={`py-2 text-right font-mono ${
-                        pnlPct === null
-                          ? "text-muted"
-                          : pnlPct > 0
-                          ? "text-accent"
-                          : pnlPct < 0
-                          ? "text-negative"
-                          : "text-muted"
-                      }`}
-                    >
+                    <td className={`py-3.5 text-right font-serif font-light text-sm tabular-nums ${pnlColor}`}>
                       {pnlPct !== null
                         ? `${pnlPct > 0 ? "+" : ""}${pnlPct.toFixed(2)}%`
-                        : "—"}
+                        : "\u2014"}
                     </td>
                   </tr>
                   {isExpanded && (
                     <tr key={`${trade.id}-detail`}>
-                      <td
-                        colSpan={6}
-                        className="py-3 px-3 bg-white/5 text-sm text-gray-300"
-                      >
-                        <div className="font-medium text-xs text-muted mb-1 uppercase">
+                      <td colSpan={6} className="py-4 px-6 bg-surface-alt">
+                        <div className="font-sans font-light text-[10px] tracking-luxury uppercase text-subtle mb-2">
                           Claude&apos;s Reasoning
                         </div>
-                        {trade.reasoning}
+                        <p className="font-sans font-light text-sm text-secondary leading-relaxed italic">
+                          {trade.reasoning}
+                        </p>
                       </td>
                     </tr>
                   )}

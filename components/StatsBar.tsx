@@ -13,26 +13,33 @@ type Stats = {
   totalClosed: number;
 };
 
-function StatCard({
+function Stat({
   label,
   value,
-  sub,
   color,
+  isLast,
 }: {
   label: string;
   value: string;
-  sub?: string;
   color?: string;
+  isLast?: boolean;
 }) {
   return (
-    <div className="bg-card rounded-xl p-4 border border-white/5">
-      <div className="text-muted text-xs uppercase tracking-wider mb-1">
+    <div
+      className={`flex-1 text-center py-4 ${
+        !isLast ? "border-r border-border" : ""
+      }`}
+    >
+      <div className="font-sans font-light text-[10px] tracking-luxury uppercase text-subtle mb-2">
         {label}
       </div>
-      <div className={`text-xl sm:text-2xl font-bold ${color || "text-white"}`}>
+      <div
+        className={`font-serif font-light text-2xl sm:text-3xl ${
+          color || "text-primary"
+        }`}
+      >
         {value}
       </div>
-      {sub && <div className="text-muted text-xs mt-0.5">{sub}</div>}
     </div>
   );
 }
@@ -54,42 +61,49 @@ export default function StatsBar() {
 
   if (!stats) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="flex animate-fade-in">
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="bg-card rounded-xl p-4 border border-white/5 animate-pulse h-20"
-          />
+            className={`flex-1 text-center py-4 ${
+              i < 4 ? "border-r border-border" : ""
+            }`}
+          >
+            <div className="h-3 w-16 bg-border-light rounded mx-auto mb-3" />
+            <div className="h-8 w-20 bg-border-light rounded mx-auto" />
+          </div>
         ))}
       </div>
     );
   }
 
-  const pnlColor = stats.allTimePnl >= 0 ? "text-accent" : "text-negative";
-  const streakText =
-    stats.streak > 0
-      ? `${stats.streak} ${stats.streakType === "win" ? "W" : "L"} streak`
-      : "No streak";
+  const pnlColor =
+    stats.allTimePnl > 0
+      ? "text-positive"
+      : stats.allTimePnl < 0
+      ? "text-negative"
+      : "text-primary";
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 animate-fade-in">
-      <StatCard
+    <div className="flex animate-fade-in-delay-1">
+      <Stat
         label="Balance"
         value={`$${stats.currentBalance.toFixed(2)}`}
-        sub={`${stats.totalTrades} total decisions`}
       />
-      <StatCard
-        label="All-Time P&L"
+      <Stat
+        label="All-Time Return"
         value={`${stats.allTimePnl >= 0 ? "+" : ""}${stats.allTimePnl.toFixed(2)}%`}
         color={pnlColor}
-        sub={`vs $100 initial`}
       />
-      <StatCard
+      <Stat
         label="Win Rate"
         value={`${stats.winRate.toFixed(1)}%`}
-        sub={`${stats.wins}/${stats.totalClosed} closed`}
       />
-      <StatCard label="Streak" value={streakText} sub="Recent trades" />
+      <Stat
+        label="Trades"
+        value={`${stats.totalTrades}`}
+        isLast
+      />
     </div>
   );
 }

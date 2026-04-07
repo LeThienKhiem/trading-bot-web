@@ -8,15 +8,27 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: "#0a0a0a",
-        card: "#111111",
-        "card-hover": "#1a1a1a",
-        accent: "#00ff88",
-        negative: "#ff4444",
-        muted: "#888888",
+        bg: "#FAFAF8",
+        surface: "#FFFFFF",
+        "surface-alt": "#F5F2ED",
+        border: "#E8E4DE",
+        "border-light": "#F0EDE8",
+        primary: "#1A1814",
+        secondary: "#6B6560",
+        subtle: "#A09890",
+        gold: "#B8975A",
+        "gold-light": "#D4B896",
+        positive: "#2D6A4F",
+        negative: "#8B3A3A",
+        neutral: "#6B6560",
       },
       fontFamily: {
+        serif: ["Cormorant Garamond", "Georgia", "serif"],
         sans: ["Inter", "system-ui", "sans-serif"],
+      },
+      letterSpacing: {
+        luxury: "0.15em",
+        "luxury-wide": "0.3em",
       },
     },
   },

@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 
 export default function Header() {
   const [isLive, setIsLive] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     async function checkLiveness() {
@@ -17,38 +18,44 @@ export default function Header() {
 
       if (data) {
         const diff = Date.now() - new Date(data.created_at).getTime();
-        setIsLive(diff < 5 * 60 * 60 * 1000); // Live if data < 5 hours old
+        setIsLive(diff < 5 * 60 * 60 * 1000);
       }
     }
     checkLiveness();
     const interval = setInterval(checkLiveness, 60000);
-    return () => clearInterval(interval);
+
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   return (
-    <header className="border-b border-white/5 px-4 py-4 sm:px-6">
-      <div className="max-w-6xl mx-auto flex items-center justify-between">
+    <header
+      className={`sticky top-0 z-50 bg-surface border-b border-border transition-shadow duration-500 ${
+        scrolled ? "shadow-[0_1px_20px_rgba(0,0,0,0.04)]" : ""
+      }`}
+    >
+      <div className="max-w-[1200px] mx-auto px-6 py-5 flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl sm:text-2xl font-bold text-white">
-              BTC Trading Bot
-            </h1>
-            <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full bg-white/5">
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  isLive ? "bg-accent live-dot" : "bg-muted"
-                }`}
-              />
-              {isLive ? "Live" : "Offline"}
-            </span>
-          </div>
-          <p className="text-muted text-sm mt-0.5">
-            Powered by Claude AI &middot; Started Apr 2026
+          <h1 className="font-serif font-light text-2xl tracking-luxury-wide text-primary uppercase">
+            AlphaBot
+          </h1>
+          <p className="font-sans font-light text-[10px] tracking-luxury uppercase text-subtle mt-0.5">
+            Autonomous Trading Intelligence
           </p>
         </div>
-        <div className="hidden sm:block text-right text-xs text-muted">
-          <div>BTC/USDT Spot</div>
-          <div>Binance</div>
+        <div className="flex items-center gap-2">
+          <span
+            className={`w-1.5 h-1.5 rounded-full ${
+              isLive ? "bg-gold live-dot" : "bg-subtle"
+            }`}
+          />
+          <span className="font-sans font-light text-[10px] tracking-luxury uppercase text-gold">
+            {isLive ? "Live" : "Offline"}
+          </span>
         </div>
       </div>
     </header>

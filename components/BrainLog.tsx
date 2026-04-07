@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import { supabase, Trade } from "@/lib/supabase";
 
-const ACTION_STYLES: Record<string, { emoji: string; color: string; bg: string }> = {
-  BUY: { emoji: "🟢", color: "text-accent", bg: "bg-accent/10" },
-  SELL: { emoji: "🟡", color: "text-yellow-400", bg: "bg-yellow-400/10" },
-  HOLD: { emoji: "⏸️", color: "text-muted", bg: "bg-white/5" },
-  BLOCKED: { emoji: "🚫", color: "text-negative", bg: "bg-negative/10" },
+const ACTION_STYLES: Record<string, { dot: string; text: string }> = {
+  BUY: { dot: "bg-positive", text: "text-positive" },
+  SELL: { dot: "bg-gold", text: "text-gold" },
+  HOLD: { dot: "bg-neutral", text: "text-neutral" },
+  BLOCKED: { dot: "bg-negative", text: "text-negative" },
 };
 
 export default function BrainLog() {
@@ -39,18 +39,24 @@ export default function BrainLog() {
 
   if (trades.length === 0) {
     return (
-      <div className="bg-card rounded-xl p-4 border border-white/5">
-        <h2 className="text-white font-semibold mb-3">Brain Log</h2>
-        <p className="text-muted text-sm">No decisions yet. Bot is warming up...</p>
+      <div className="bg-surface rounded-sm border border-border p-8 card-hover">
+        <h2 className="font-serif font-normal italic text-lg text-primary mb-6">
+          Decision Log
+        </h2>
+        <p className="font-sans font-light text-sm text-subtle">
+          No decisions yet. The bot is warming up...
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-card rounded-xl p-4 border border-white/5">
-      <h2 className="text-white font-semibold mb-3">Brain Log</h2>
-      <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
-        {trades.map((trade) => {
+    <div className="bg-surface rounded-sm border border-border p-8 card-hover animate-fade-in-delay-3">
+      <h2 className="font-serif font-normal italic text-lg text-primary mb-6">
+        Decision Log
+      </h2>
+      <div className="space-y-0 max-h-[420px] overflow-y-auto pr-2">
+        {trades.map((trade, i) => {
           const style = ACTION_STYLES[trade.action] || ACTION_STYLES.HOLD;
           const pnl = trade.pnl_usdt;
           const hasPnl = pnl !== null && pnl !== undefined;
@@ -58,43 +64,44 @@ export default function BrainLog() {
           return (
             <div
               key={trade.id}
-              className={`${style.bg} rounded-lg p-3 border border-white/5 animate-fade-in`}
+              className={`py-5 animate-fade-in ${
+                i < trades.length - 1 ? "border-b border-border-light" : ""
+              }`}
             >
-              <div className="flex items-center justify-between mb-1">
-                <span className={`font-semibold text-sm ${style.color}`}>
-                  {style.emoji} {trade.action}
-                </span>
-                <span className="text-xs text-muted">
-                  Confidence: {trade.confidence}/10
-                </span>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
+                  <span
+                    className={`font-sans font-normal text-[10px] tracking-luxury uppercase ${style.text}`}
+                  >
+                    {trade.action}
+                  </span>
+                  <span className="font-sans font-light text-[10px] text-subtle ml-1">
+                    {trade.confidence}/10
+                  </span>
+                </div>
+                {hasPnl && (
+                  <span
+                    className={`font-serif font-light text-sm ${
+                      pnl > 0 ? "text-positive" : "text-negative"
+                    }`}
+                  >
+                    {pnl > 0 ? "+" : ""}${pnl.toFixed(2)}
+                  </span>
+                )}
               </div>
-              <div className="text-xs text-muted mb-2">
+              <div className="font-sans font-light text-[10px] text-subtle mb-2">
                 {new Date(trade.created_at).toLocaleString("en-US", {
                   month: "short",
                   day: "numeric",
-                  year: "numeric",
                   hour: "2-digit",
                   minute: "2-digit",
-                  timeZoneName: "short",
                 })}
-                {" | "}BTC ${trade.price_at_decision?.toLocaleString()}
+                {" \u2014 "}BTC ${trade.price_at_decision?.toLocaleString()}
               </div>
-              <p className="text-sm text-gray-300 leading-relaxed">
-                &ldquo;{trade.reasoning}&rdquo;
+              <p className="font-sans font-light text-sm text-secondary leading-relaxed">
+                {trade.reasoning}
               </p>
-              {hasPnl && (
-                <div
-                  className={`mt-2 text-xs font-medium ${
-                    pnl > 0 ? "text-accent" : "text-negative"
-                  }`}
-                >
-                  Result: {pnl > 0 ? "+" : ""}${pnl.toFixed(2)} (
-                  {trade.pnl_percent != null
-                    ? `${trade.pnl_percent > 0 ? "+" : ""}${trade.pnl_percent.toFixed(2)}%`
-                    : ""}
-                  ) {pnl > 0 ? "✅" : "❌"}
-                </div>
-              )}
             </div>
           );
         })}

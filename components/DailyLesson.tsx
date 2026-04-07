@@ -22,71 +22,88 @@ export default function DailyLesson() {
 
   if (!lesson) {
     return (
-      <div className="bg-card rounded-xl p-4 border border-white/5">
-        <h2 className="text-white font-semibold mb-3">
-          Today&apos;s Lesson
-        </h2>
-        <p className="text-muted text-sm">
-          Bot hasn&apos;t completed its first nightly review yet. Check back after 23:30 UTC!
+      <div className="max-w-[720px] mx-auto text-center py-16 animate-fade-in-delay-5">
+        <p className="font-serif font-light italic text-lg text-secondary">
+          The first lesson is yet to come.
         </p>
+        <p className="font-sans font-light text-xs text-subtle mt-2">
+          The nightly review runs at 23:30 UTC each day.
+        </p>
+        <div className="w-12 h-px bg-gold mx-auto mt-6" />
       </div>
     );
   }
 
   return (
-    <div className="bg-card rounded-xl p-4 border border-white/5 animate-fade-in">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-white font-semibold">
-          What the Bot Learned
+    <div className="max-w-[720px] mx-auto animate-fade-in-delay-5">
+      <div className="text-center mb-8">
+        <h2 className="font-serif font-normal italic text-xl text-primary">
+          Today&apos;s Lesson
         </h2>
-        <span className="text-xs text-muted bg-white/5 px-2 py-0.5 rounded">
+        <div className="w-20 h-px bg-gold mx-auto mt-3" />
+        <div className="mt-3 font-sans font-light text-[10px] tracking-luxury uppercase text-subtle">
           {new Date(lesson.date).toLocaleDateString("en-US", {
-            month: "short",
+            month: "long",
             day: "numeric",
             year: "numeric",
           })}
-        </span>
-      </div>
-
-      <div className="flex gap-4 mb-4 text-xs">
-        <div className="flex items-center gap-1">
-          <span className="text-muted">Trades:</span>
-          <span className="text-white font-medium">{lesson.total_trades}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="text-muted">Wins:</span>
-          <span className="text-accent font-medium">{lesson.wins}</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="text-muted">Losses:</span>
-          <span className="text-negative font-medium">{lesson.losses}</span>
         </div>
       </div>
 
-      <div className="bg-white/5 rounded-lg p-3 mb-3">
-        <div className="text-xs text-muted uppercase tracking-wider mb-1">
-          Lesson
+      <div className="flex justify-center gap-8 mb-8 font-sans text-xs">
+        <div className="text-center">
+          <div className="font-light text-[10px] tracking-luxury uppercase text-subtle mb-1">
+            Trades
+          </div>
+          <div className="font-serif font-light text-lg text-primary">
+            {lesson.total_trades}
+          </div>
         </div>
-        <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
+        <div className="w-px bg-border" />
+        <div className="text-center">
+          <div className="font-light text-[10px] tracking-luxury uppercase text-subtle mb-1">
+            Wins
+          </div>
+          <div className="font-serif font-light text-lg text-positive">
+            {lesson.wins}
+          </div>
+        </div>
+        <div className="w-px bg-border" />
+        <div className="text-center">
+          <div className="font-light text-[10px] tracking-luxury uppercase text-subtle mb-1">
+            Losses
+          </div>
+          <div className="font-serif font-light text-lg text-negative">
+            {lesson.losses}
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-surface-alt rounded-sm p-6 sm:p-8 mb-6">
+        <p className="font-sans font-light text-sm text-secondary leading-[1.8] whitespace-pre-wrap">
           {lesson.lesson_text}
         </p>
       </div>
 
       {lesson.pattern_identified && (
-        <div className="bg-accent/5 border border-accent/10 rounded-lg p-3 mb-3">
-          <div className="text-xs text-accent uppercase tracking-wider mb-1">
+        <div className="bg-surface rounded-sm border border-border p-6 mb-4">
+          <div className="font-sans font-light text-[10px] tracking-luxury uppercase text-subtle mb-2">
             Pattern Identified
           </div>
-          <p className="text-sm text-gray-300">{lesson.pattern_identified}</p>
+          <p className="font-sans font-light text-sm text-primary">
+            {lesson.pattern_identified}
+          </p>
         </div>
       )}
 
       {lesson.adjustment_made && (
-        <div className="bg-yellow-400/5 border border-yellow-400/10 rounded-lg p-3">
-          <div className="text-xs text-yellow-400 uppercase tracking-wider mb-1">
+        <div className="bg-surface rounded-sm border-l-2 border-l-gold border border-border p-6">
+          <div className="font-sans font-light text-[10px] tracking-luxury uppercase text-gold mb-2">
             Rule for Tomorrow
           </div>
-          <p className="text-sm text-gray-300">{lesson.adjustment_made}</p>
+          <p className="font-sans font-light text-sm text-primary">
+            {lesson.adjustment_made}
+          </p>
         </div>
       )}
     </div>

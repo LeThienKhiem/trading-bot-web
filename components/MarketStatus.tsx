@@ -12,15 +12,6 @@ function getFearLabel(index: number | null): string {
   return "Extreme Greed";
 }
 
-function getFearColor(index: number | null): string {
-  if (index === null) return "text-muted";
-  if (index <= 25) return "text-negative";
-  if (index <= 45) return "text-orange-400";
-  if (index <= 55) return "text-yellow-400";
-  if (index <= 75) return "text-accent";
-  return "text-accent";
-}
-
 export default function MarketStatus() {
   const [market, setMarket] = useState<MarketContext | null>(null);
 
@@ -49,71 +40,83 @@ export default function MarketStatus() {
 
   if (!market) {
     return (
-      <div className="bg-card rounded-xl p-4 border border-white/5">
-        <h2 className="text-white font-semibold mb-3">Market Status</h2>
-        <p className="text-muted text-sm">Waiting for market data...</p>
+      <div className="bg-surface rounded-sm border border-border p-8 card-hover">
+        <h2 className="font-serif font-normal italic text-lg text-primary mb-6">
+          Market Status
+        </h2>
+        <p className="font-sans font-light text-sm text-subtle">
+          Awaiting first market data...
+        </p>
       </div>
     );
   }
 
-  const sentimentEmoji = {
-    positive: "🟢",
-    negative: "🔴",
-    neutral: "⚪",
-  }[market.news_sentiment ?? "neutral"] ?? "⚪";
+  const rows = [
+    {
+      label: "BTC / USDT",
+      value: `$${market.btc_price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+      large: true,
+    },
+    {
+      label: "RSI (1h)",
+      value: market.rsi_1h?.toFixed(1) ?? "N/A",
+      color:
+        (market.rsi_1h ?? 50) > 70
+          ? "text-negative"
+          : (market.rsi_1h ?? 50) < 30
+          ? "text-positive"
+          : undefined,
+    },
+    {
+      label: "MACD",
+      value: market.macd_signal ?? "N/A",
+      color:
+        market.macd_signal === "bullish"
+          ? "text-positive"
+          : market.macd_signal === "bearish"
+          ? "text-negative"
+          : undefined,
+    },
+    {
+      label: "Fear & Greed",
+      value: `${market.fear_greed_index ?? "N/A"} ${getFearLabel(market.fear_greed_index)}`,
+    },
+    {
+      label: "Sentiment",
+      value: market.news_sentiment ?? "N/A",
+    },
+  ];
 
   return (
-    <div className="bg-card rounded-xl p-4 border border-white/5">
-      <h2 className="text-white font-semibold mb-3">Market Status</h2>
-      <div className="space-y-3">
-        <div className="flex justify-between items-center">
-          <span className="text-muted text-sm">BTC Price</span>
-          <span className="text-white font-mono font-semibold">
-            ${market.btc_price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-          </span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-muted text-sm">RSI (1h)</span>
-          <span
-            className={`font-mono ${
-              (market.rsi_1h ?? 50) > 70
-                ? "text-negative"
-                : (market.rsi_1h ?? 50) < 30
-                ? "text-accent"
-                : "text-white"
+    <div className="bg-surface rounded-sm border border-border p-8 card-hover animate-fade-in-delay-3">
+      <h2 className="font-serif font-normal italic text-lg text-primary mb-6">
+        Market Status
+      </h2>
+      <div className="space-y-0">
+        {rows.map((row, i) => (
+          <div
+            key={row.label}
+            className={`flex justify-between items-baseline py-3 ${
+              i < rows.length - 1 ? "border-b border-border-light" : ""
             }`}
           >
-            {market.rsi_1h?.toFixed(1) ?? "N/A"}
-          </span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-muted text-sm">MACD</span>
-          <span
-            className={`text-sm font-medium ${
-              market.macd_signal === "bullish"
-                ? "text-accent"
-                : market.macd_signal === "bearish"
-                ? "text-negative"
-                : "text-muted"
-            }`}
-          >
-            {market.macd_signal ?? "N/A"}
-          </span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-muted text-sm">Fear & Greed</span>
-          <span className={`font-mono ${getFearColor(market.fear_greed_index)}`}>
-            {market.fear_greed_index ?? "N/A"}{" "}
-            <span className="text-xs">{getFearLabel(market.fear_greed_index)}</span>
-          </span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-muted text-sm">Sentiment</span>
-          <span className="text-sm">
-            {sentimentEmoji} {market.news_sentiment ?? "N/A"}
-          </span>
-        </div>
-        <div className="pt-2 border-t border-white/5 text-xs text-muted">
+            <span className="font-sans font-light text-[10px] tracking-luxury uppercase text-subtle">
+              {row.label}
+            </span>
+            <span
+              className={`font-sans font-normal tabular-nums ${
+                row.large
+                  ? "font-serif font-light text-xl text-primary"
+                  : `text-sm ${row.color || "text-primary"}`
+              }`}
+            >
+              {row.value}
+            </span>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 pt-3 border-t border-border-light">
+        <span className="font-sans font-light text-[10px] text-subtle">
           Updated{" "}
           {new Date(market.created_at).toLocaleString("en-US", {
             month: "short",
@@ -121,7 +124,7 @@ export default function MarketStatus() {
             hour: "2-digit",
             minute: "2-digit",
           })}
-        </div>
+        </span>
       </div>
     </div>
   );
